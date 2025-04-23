@@ -110,9 +110,6 @@ export class UserRepository {
     if (error.code === PostgresErrorCode.UNIQUE_VIOLATION) {
       const detail = error.detail?.toLowerCase() || '';
 
-      if (detail.includes('username'))
-        throw new ConflictException('Username already exists');
-
       if (detail.includes('email'))
         throw new ConflictException('Email already exists');
 

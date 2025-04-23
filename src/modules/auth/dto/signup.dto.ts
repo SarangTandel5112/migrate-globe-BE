@@ -10,19 +10,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SignUpDto {
   @ApiProperty({
-    example: 'john_doe',
-    description:
-      'Username must be 3-20 characters, alphanumeric with underscores',
-  })
-  @IsNotEmpty({ message: 'Username is required' })
-  @Matches(/^[a-zA-Z0-9_]+$/, {
-    message: 'Username can only contain letters, numbers, and underscores',
-  })
-  @MinLength(3, { message: 'Username must be at least 3 characters long' })
-  @MaxLength(20, { message: 'Username cannot exceed 20 characters' })
-  readonly username: string;
-
-  @ApiProperty({
     example: 'john.doe@example.com',
     description: 'Valid email address',
   })

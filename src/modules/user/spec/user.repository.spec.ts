@@ -16,7 +16,6 @@ describe('UserRepository', () => {
 
   const mockUser: User = {
     id: '1',
-    username: 'testuser',
     email: 'test@example.com',
     password: 'testpassword',
     phoneNumber: '1234567890',
@@ -101,7 +100,7 @@ describe('UserRepository', () => {
 
   describe('createUser', () => {
     it('should successfully create a user', async () => {
-      const newUser = { username: 'newuser', email: 'new@example.com' };
+      const newUser = { email: 'new@example.com' };
       jest.spyOn(mockUserRepo, 'save').mockResolvedValue(mockUser);
 
       const result = await userRepository.createUser(newUser);
@@ -109,22 +108,8 @@ describe('UserRepository', () => {
       expect(mockUserRepo.save).toHaveBeenCalledWith(newUser);
     });
 
-    it('should throw ConflictException for duplicate username', async () => {
-      const newUser = { username: 'existinguser', email: 'new@example.com' };
-      const error = {
-        code: PostgresErrorCode.UNIQUE_VIOLATION,
-        detail: 'Key (username)=(existinguser) already exists',
-      };
-      jest.spyOn(mockUserRepo, 'save').mockRejectedValue(error);
-
-      await expect(userRepository.createUser(newUser)).rejects.toThrow(
-        ConflictException,
-      );
-      expect(mockUserRepo.save).toHaveBeenCalledWith(newUser);
-    });
-
     it('should throw ConflictException for duplicate email', async () => {
-      const newUser = { username: 'newuser', email: 'existing@example.com' };
+      const newUser = { email: 'existing@example.com' };
       const error = {
         code: PostgresErrorCode.UNIQUE_VIOLATION,
         detail: 'Key (email)=(existing@example.com) already exists',
@@ -138,7 +123,6 @@ describe('UserRepository', () => {
 
     it('should throw ConflictException for duplicate phone number', async () => {
       const newUser = {
-        username: 'newuser',
         email: 'new@example.com',
         phoneNumber: '1234567890',
       };
@@ -154,7 +138,7 @@ describe('UserRepository', () => {
     });
 
     it('should throw InternalServerErrorException for other database errors', async () => {
-      const newUser = { username: 'newuser', email: 'new@example.com' };
+      const newUser = { email: 'new@example.com' };
       jest
         .spyOn(mockUserRepo, 'save')
         .mockRejectedValue(new Error('Database error'));
@@ -167,7 +151,7 @@ describe('UserRepository', () => {
 
   describe('updateUser', () => {
     it('should successfully update a user', async () => {
-      const updateData = { username: 'updateduser' };
+      const updateData = { email: 'updateduser' };
       const updatedUser = { ...mockUser, ...updateData };
 
       jest.spyOn(userRepository, 'getUserById').mockResolvedValue(mockUser);
@@ -180,7 +164,7 @@ describe('UserRepository', () => {
     });
 
     it('should throw NotFoundException when user not found', async () => {
-      const updateData = { username: 'updateduser' };
+      const updateData = { email: 'updateduser@gmail.com' };
       jest
         .spyOn(userRepository, 'getUserById')
         .mockRejectedValue(new NotFoundException());
@@ -190,23 +174,8 @@ describe('UserRepository', () => {
       );
     });
 
-    it('should throw ConflictException for duplicate username', async () => {
-      const updateData = { username: 'existinguser' };
-      const error = {
-        code: PostgresErrorCode.UNIQUE_VIOLATION,
-        detail: 'Key (username)=(existinguser) already exists',
-      };
-
-      jest.spyOn(userRepository, 'getUserById').mockResolvedValue(mockUser);
-      jest.spyOn(mockUserRepo, 'save').mockRejectedValue(error);
-
-      await expect(userRepository.updateUser('1', updateData)).rejects.toThrow(
-        ConflictException,
-      );
-    });
-
     it('should throw InternalServerErrorException for other database errors', async () => {
-      const updateData = { username: 'updateduser' };
+      const updateData = { email: 'updateduser' };
       jest.spyOn(userRepository, 'getUserById').mockResolvedValue(mockUser);
       jest
         .spyOn(mockUserRepo, 'save')
@@ -251,17 +220,6 @@ describe('UserRepository', () => {
   });
 
   describe('handleUniqueViolation', () => {
-    it('should throw ConflictException for username conflict', () => {
-      const error = {
-        code: PostgresErrorCode.UNIQUE_VIOLATION,
-        detail: 'Key (username)=(existing) already exists',
-      };
-
-      expect(() =>
-        (userRepository as any).handleUniqueViolation(error),
-      ).toThrow(ConflictException);
-    });
-
     it('should throw ConflictException for email conflict', () => {
       const error = {
         code: PostgresErrorCode.UNIQUE_VIOLATION,

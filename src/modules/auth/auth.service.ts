@@ -30,12 +30,11 @@ export class AuthService {
   // User Signup
   async signUp(signUpDto: SignUpDto): Promise<{ message: string }> {
     try {
-      const { username, email, phoneNumber, password } = signUpDto;
+      const { email, phoneNumber, password } = signUpDto;
 
       // Check all unique fields in parallel
-      const [emailExists, usernameExists, phoneExists] = await Promise.all([
+      const [emailExists, phoneExists] = await Promise.all([
         this.userRepo.findOne({ where: { email } }),
-        this.userRepo.findOne({ where: { username } }),
         phoneNumber
           ? this.userRepo.findOne({ where: { phoneNumber } })
           : Promise.resolve(null),
@@ -44,7 +43,6 @@ export class AuthService {
       // Build errors object
       const errors: Record<string, string> = {};
       if (emailExists) errors.email = 'Email already exists';
-      if (usernameExists) errors.username = 'Username already exists';
       if (phoneExists) errors.phoneNumber = 'Phone number already exists';
 
       // If any errors exist, throw them
@@ -59,7 +57,6 @@ export class AuthService {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = this.userRepo.create({
-        username,
         email,
         phoneNumber,
         password: hashedPassword,

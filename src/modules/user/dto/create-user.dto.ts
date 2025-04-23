@@ -4,14 +4,6 @@ import { User } from '../entities/user.entity';
 
 export class CreateUserDto {
   @ApiProperty({
-    example: 'john_doe',
-    description: 'Unique username',
-  })
-  @IsString()
-  @IsNotEmpty()
-  readonly username: string;
-
-  @ApiProperty({
     example: 'user@example.com',
     description: 'User email address',
   })

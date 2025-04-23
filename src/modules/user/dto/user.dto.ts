@@ -17,14 +17,6 @@ export class UserDto {
   readonly id: string;
 
   @ApiProperty({
-    example: 'john_doe',
-    description: 'Unique username',
-  })
-  @IsString()
-  @IsNotEmpty()
-  readonly username: string;
-
-  @ApiProperty({
     example: 'user@example.com',
     description: 'User email address',
   })
@@ -54,7 +46,6 @@ export class UserDto {
 
   constructor(user: User) {
     this.id = user.id;
-    this.username = user.username;
     this.email = user.email;
     this.phoneNumber = user.phoneNumber;
     this.createdAt = user.createdAt;
